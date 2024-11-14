@@ -57,7 +57,15 @@ library(Metrics)
 library(ipred) 
 library(caTools)
 
+# Deleting index column
 data <- data[,-1] 
+
+# Converting remaining categorical variables to factor
+data$Risk <- as.factor(data$Risk)
+data$Sex <- as.factor(data$Sex)
+data$Saving.accounts <- as.factor(data$Saving.accounts)
+data$Purpose <- as.factor(data$Purpose)
+
 head(data) 
 set.seed(100) 
 sample_split <- sample.split(Y = data$Risk, SplitRatio = 0.7) 
@@ -67,44 +75,21 @@ test_set <- subset(x = data, sample_split == FALSE)
 #------------------------
 # Decision Tree 
 #------------------------
-origin_pred = test_set$Risk 
 dt_model <- rpart(Risk ~ ., data = train_set, method = "class") 
 dt_pred <- predict(dt_model, test_set[,-10], type = "class") 
-confusionMatrix(factor(origin_pred), factor(dt_pred)) 
-accuracy(origin_pred, dt_pred) 
+confusionMatrix(test_set$Risk, dt_pred) 
+accuracy(test_set$Risk , dt_pred) 
 rpart.plot(dt_model) 
 
 #------------------------
 # Random Forest 
 #------------------------
-origin_pred = train_set$Risk 
-head(train_set)
+rf_model <- randomForest(Risk ~ ., data = train_set, ntree=50, ntry=3, importance=TRUE, na.action=randomForest::na.roughfix, replace=FALSE) 
+rf_pred <- predict(rf_model, newdata = test_set[,-10])
+confusionMatrix(test_set$Risk, rf_pred)
+accuracy(test_set$Risk , rf_pred)
+varImpPlot(rf_model, col=3)
 
-# Convert categorical columns to factors
-rf_train_set <- lapply(train_set, function(x) {
-  if (is.character(x)) {
-    as.factor(x)
-  } else {
-    x
-  }
-})
-rf_test_set <- lapply(test_set, function(x) {
-  if (is.character(x)) {
-    as.factor(x)
-  } else {
-    x
-  }
-})
-head(rf_train_set)
-head(rf_test_set)
-
-# Appling model
-rf_model <- randomForest(Risk ~ ., data = rf_train_set, ntree=50, ntry=3, importance=TRUE, na.action=na.roughfix) 
-rf_pred <- predict(rf_model, rf_test_set) 
-rf_pred <- ifelse(rf_pred> 0.5,1,0) 
-confusionMatrix(factor(origin_pred), factor(rf_pred)) 
-accuracy(origin_pred, rf_pred) 
-varImpPlot(rf_model, col=3) 
 
 
 
