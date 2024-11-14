@@ -27,12 +27,11 @@ data <- read.csv("Special Topics/Assignment 4/german_credit_data.csv")
 head(data)
 
 table(data$Housing)
-table(data$Checking.account)
-
 housing_factor <- as.factor(data$Housing)
-checking_account_factor <- factor(data$Checking.account)
-
 table(housing_factor)
+
+table(data$Checking.account)
+checking_account_factor <- factor(data$Checking.account)
 table(checking_account_factor)
 
 #------------------------
@@ -63,6 +62,17 @@ library(caTools)
 
 # Deleting index column
 data <- data[,-1] 
+
+# Handling NA values
+data <- data.frame(lapply(data, function(x) {
+  if (is.numeric(x)) {
+    x[is.na(x)] <- median(x, na.rm = TRUE)
+  } else if (is.factor(x) || is.character(x)) {
+    x[is.na(x)] <- as.character(stats::na.omit(x)[which.max(table(x))])
+    x <- as.factor(x)
+  }
+  return(x)
+}))
 
 # Converting remaining categorical variables to factor
 data$Risk <- as.factor(data$Risk)
