@@ -29,8 +29,8 @@ head(data)
 table(data$Housing)
 table(data$Checking.account)
 
-housing_factor <- factor(data$Housing, levels = c(0,1,2), labels = c("rent", "own", "free"))
-checking_account_factor <- factor(data$Checking.account, levels = c(0,1,2,3), labels = c('NA', 'little','moderate','rich'))
+housing_factor <- as.factor(data$Housing)
+checking_account_factor <- factor(data$Checking.account)
 
 table(housing_factor)
 table(checking_account_factor)
@@ -38,12 +38,16 @@ table(checking_account_factor)
 #------------------------
 # Box and Density Plot
 #------------------------
-boxplot(data$Credit.amount ~ housing_factor * checking_account_factor,
+boxplot(Credit.amount ~ Housing * Checking.account,
         data=data,
         varwidth=TRUE,
-        col=c('gold','darkgreen')
-)
+        col=c('gold','darkgreen','blue'),
+        main="Credit Amount vs Housing & Checking Account",
+        xlab="Housing Type",
+        ylab="Credit Amount")
+
 sm.density.compare(data$Credit.amount, data$Housing)
+title(main="Credit Amount by Housing Type")
 
 
 #------------------------
