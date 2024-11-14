@@ -21,22 +21,22 @@ str(pageview_data)
 #------------------------
 # Get factors
 #------------------------
-library(sm)
-
 data <- read.csv("Special Topics/Assignment 4/german_credit_data.csv")
 head(data)
 
-table(data$Housing)
+str(data$Housing)
 housing_factor <- as.factor(data$Housing)
-table(housing_factor)
+str(housing_factor)
 
-table(data$Checking.account)
+str(data$Checking.account)
 checking_account_factor <- factor(data$Checking.account)
-table(checking_account_factor)
+str(checking_account_factor)
 
 #------------------------
 # Box and Density Plot
 #------------------------
+library(sm)
+
 boxplot(Credit.amount ~ Housing * Checking.account,
         data=data,
         varwidth=TRUE,
@@ -61,7 +61,9 @@ library(ipred)
 library(caTools)
 
 # Deleting index column
+data <- read.csv("Special Topics/Assignment 4/german_credit_data.csv")
 data <- data[,-1] 
+head(data)
 
 # Handling NA values
 data <- data.frame(lapply(data, function(x) {
@@ -74,7 +76,7 @@ data <- data.frame(lapply(data, function(x) {
   return(x)
 }))
 
-# Converting remaining categorical variables to factor
+# Handling categorical variables
 data$Risk <- as.factor(data$Risk)
 data$Sex <- as.factor(data$Sex)
 data$Saving.accounts <- as.factor(data$Saving.accounts)
